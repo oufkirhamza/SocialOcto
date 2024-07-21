@@ -11,7 +11,7 @@ import Lottie from "react-lottie";
 export const FirstSectionAbout = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
   const [userName, setUserName] = useContext(MyContext);
-  const secretKey = process.env.REACT_APP_ACCESS_KEY;
+  // const secretKey = process.env.REACT_APP_ACCESS_KEY;
   const [data, setData] = useState("");
   const [dataFollowers, setDataFollowers] = useState("");
   const [dataRepos, setDataRepos] = useState("");
