@@ -5,89 +5,97 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import logo_github from "../../../assets/img/Animation_githubLogo.json";
+import Lottie from "react-lottie";
 
 export const FirstSectionAbout = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
   const [userName, setUserName] = useContext(MyContext);
-
+  const secretKey = process.env.REACT_APP_ACCESS_KEY;
   const [data, setData] = useState("");
   const [dataFollowers, setDataFollowers] = useState("");
   const [dataRepos, setDataRepos] = useState("");
   const [reposLanguages, setReposLanguages] = useState("");
-  const token = "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";
   const navigate = useNavigate();
   const repos = [...dataRepos];
   const languages = [...reposLanguages];
   const morpho = {};
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const fetchData = async () => {
-      [
-        [`https://api.github.com/users/${userName}`, setData],
-        [
-          `https://api.github.com/users/${userName}/followers`,
-          setDataFollowers,
-        ],
-        [`https://api.github.com/users/${userName}/repos`, setDataRepos],
-      ].forEach(([link, setValue]) => {
-        console.log("this is ", userName);
-        axios
-          .get(link, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((res) => {
-            setValue(res.data);
-          })
-          .catch((error) => {
-            if (error.response && error.response.status === 403) {
-              console.error(
-                "Access forbidden: Check your credentials and permissions."
-              );
-            } else {
-              console.error("An error occurred:", error.message);
-            }
-          });
-      });
+    const fetchingData = async () => {
+      // User
+
+      const fetchUser = await axios
+        .get(`https://api.github.com/users/${userName}`, {
+          headers: {
+            Authorization: `Bearer ${secretKey}`,
+          },
+        })
+        .catch((error) => {
+          console.log("user : ", error);
+        });
+
+      // followers
+      const fetchFollowers = await axios
+        .get(`https://api.github.com/users/${userName}/followers`, {
+          headers: {
+            Authorization: `Bearer ${secretKey}`,
+          },
+        })
+        .catch((error) => {
+          console.log("followers : ", error);
+        });
+
+      // repos
+      const fetchRepos = await axios
+        .get(`https://api.github.com/users/${userName}/repos`, {
+          headers: {
+            Authorization: `Bearer ${secretKey}`,
+          },
+        })
+        .catch((error) => {
+          console.log("repos : ", error);
+        });
+      setData(fetchUser.data);
+      setDataFollowers(fetchFollowers.data);
+      setDataRepos(fetchRepos.data);
     };
-    
-    fetchData();
+    fetchingData();
   }, [userName]);
-  useEffect(()=>{
+  useEffect(() => {
     const fetchLanguages = async () => {
-      if (repos.length > 0) {
-        let temp = [];
-        for (let index = 0; index < repos.length; index++) {
-          const element = repos[index];
-          await axios
-            .get(
-              `https://api.github.com/repos/${userName}/${element.name}/languages`,
+      if (repos.length === 0) return;
+
+      try {
+        const languagesData = await Promise.all(
+          repos.map((repo) =>
+            axios.get(
+              `https://api.github.com/repos/${userName}/${repo.name}/languages`,
               {
                 headers: {
-                  Authorization: `Bearer ${token}`,
+                  Authorization: `Bearer ${secretKey}`,
                 },
               }
             )
-            .then((response) => {
-              temp[index] = response.data;
-              setReposLanguages(temp);
-              console.log("reposlanguages : ", reposLanguages);
-            })
-            .catch((error) => {
-              if (error.response && error.response.status === 403) {
-                console.error(
-                  "Access forbidden: Check your credentials and permissions."
-                );
-              } else {
-                console.error("An error occurred:", error.message);
-              }
-            });
+          )
+        );
+        const temp = languagesData.map((response) => response.data);
+        setReposLanguages(temp);
+        setLoading(false);
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          console.error(
+            "Access forbidden: Check your credentials and permissions."
+          );
+        } else {
+          console.error("An error occurred:", error.message);
         }
       }
     };
-    fetchLanguages();
-  }, [userName])
+    if (repos.length > 0 && reposLanguages.length === 0) {
+      fetchLanguages();
+    }
+  }, [repos, reposLanguages.length, userName]);
   if (reposLanguages) {
     languages.forEach((element) => {
       for (const property in element) {
@@ -96,7 +104,7 @@ export const FirstSectionAbout = () => {
         } else {
           morpho[property] = element[property];
         }
-        console.log("this morpho : ", morpho);
+        // console.log("this morpho : ", morpho);
       }
     });
   }
@@ -104,7 +112,6 @@ export const FirstSectionAbout = () => {
     labels: Object.keys(morpho),
     datasets: [
       {
-        // label: 'My First Dataset',
         data: Object.values(morpho),
         backgroundColor: [
           "rgb(255, 99, 132)",
@@ -123,11 +130,23 @@ export const FirstSectionAbout = () => {
       },
     ],
   };
-
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: logo_github,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   return (
-    <div className="bg-[#0d1117] flex flex-col gap-10 py-6 text-white">
-      <>
-        {data ? (
+    <>
+      {loading && (
+        <div className="flex justify-center items-center min-h-[100vh] min-w-[100%] bg-[#000]">
+          <Lottie options={defaultOptions} height={400} width={400} />
+        </div>
+      )}
+      <div className="bg-[#0d1117] flex flex-col gap-10 py-6 text-white">
+        {data && !loading ? (
           <>
             <div className="flex flex-col items-center py-6">
               <img
@@ -142,7 +161,7 @@ export const FirstSectionAbout = () => {
               </div>
               <h1> Public Repos : {data.public_repos} </h1>
             </div>
-            <div className="flex flex-wrap gap-5 ml-5">
+            <div className="flex justify-center flex-wrap gap-5 ml-5">
               {repos.map((element, index) => (
                 <div
                   key={index}
@@ -156,23 +175,27 @@ export const FirstSectionAbout = () => {
                     <p>{element.name}</p>
                     {languages[index] && (
                       <div className="flex gap-3">
-                      {Object.getOwnPropertyNames(languages[index]).map((element, index)=>(
-                        <p className="">{element}</p>
-                      ))}
+                        {Object.getOwnPropertyNames(languages[index]).map(
+                          (element, index) => (
+                            <p key={index} className="">
+                              {element}
+                            </p>
+                          )
+                        )}
                       </div>
                     )}
                   </a>
                 </div>
               ))}
             </div>
+            <div className="flex justify-center w-[50%] mx-auto">
+              <Doughnut data={copa} />
+            </div>
           </>
         ) : (
-          <h1>There is no user</h1>
+          !loading && <h1>There is no user</h1>
         )}
-      </>
-      <div className="flex justify-center w-[50%] mx-auto">
-        <Doughnut data={copa} />
       </div>
-    </div>
+    </>
   );
 };
