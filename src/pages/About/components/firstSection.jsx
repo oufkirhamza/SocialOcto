@@ -6,6 +6,10 @@ import { Doughnut } from "react-chartjs-2";
 import logo_github from "../../../assets/img/Animation_githubLogo.json";
 import Lottie from "react-lottie";
 import logo_glasses from "../../../assets/img/logo glasses.png";
+import { IoHome } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import { FaBookOpen } from "react-icons/fa6";
+import { LuGithub } from "react-icons/lu";
 
 export const FirstSectionAbout = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
@@ -60,12 +64,12 @@ export const FirstSectionAbout = () => {
           .catch((error) => {
             // console.log("repos : ", error);
           });
-        // .finally (setLoading(false));
         if (fetchUser && fetchFollowers && fetchRepos) {
           setData(fetchUser.data);
+          
           setDataFollowers(fetchFollowers.data);
           setDataRepos(fetchRepos.data);
-          console.log(dataFollowers, data);
+          // console.log(dataFollowers, data);
         } else {
           setLoading(false);
         }
@@ -74,7 +78,7 @@ export const FirstSectionAbout = () => {
     fetchingData();
     // setLoading(false);
   }, [userName]);
-
+  
   useEffect(() => {
     const fetchLanguages = async () => {
       if (repos.length === 0) return;
@@ -160,50 +164,78 @@ export const FirstSectionAbout = () => {
           <Lottie options={defaultOptions} height={400} width={400} />
         </div>
       ) : (
-        <div className="bg-[#0d1117] flex flex-col gap-10 py-6 text-white">
+        <div className="bg-[#0d1117] flex flex-col gap-10 px-5 py-6 text-white">
           {data ? (
             <>
               <div className="flex flex-col items-center py-6">
-                <img
-                  className="rounded-full w-[10vw]"
-                  src={data.avatar_url}
-                  alt=""
-                />
-                <h1 className="text-4xl"> {data.name} </h1>
-                <div>
-                  <h1> Following : {data.following} </h1>
-                  <h1> Followers : {data.followers} </h1>
+                <Link
+                  to={"/"}
+                  className="self-start bg-[#263243] px-3 py-2 rounded-lg text-xl ml-16 "
+                >
+                  <IoHome />
+                </Link>
+                <div className="flex flex-col items-center gap-5">
+                  <img
+                    className="rounded-full lg:w-[12vw] w-[60vw]"
+                    src={data.avatar_url}
+                    alt=""
+                  />
+                  <div className="flex flex-col items-center gap-5">
+                    <h1 className="text-4xl"> {data.name} </h1>
+                    <h1 className="text-lg text-white/75"> @{data.login} </h1>
+                    <div className="flex gap-5 text-xl">
+                      <div className="flex flex-col items-center">
+                        {" "}
+                        <p>{data.following}</p> <p>Following</p>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        {" "}
+                        <p>{data.followers}</p> <p>Followers</p>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        {" "}
+                        <p>{data.public_repos}</p> <p>Public Repos</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h1> Public Repos : {data.public_repos} </h1>
               </div>
-              <div className="flex justify-center flex-wrap gap-5 ml-5">
+              <div className="flex justify-center flex-wrap lg:flex-row flex-col items-center gap-5">
                 {repos.map((element, index) => (
                   <div
                     key={index}
-                    className="border-2 border-white w-[25%] py-4 px-2"
+                    className="flex flex-col gap-9 bg-gradient-to-tr from-transparent to-[#25344a] border-2 border-slate-200/50 rounded-lg lg:w-[25%] w-full py-4 px-4"
                   >
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={element.html_url}
-                    >
+                    <div className="flex gap-2 text-xl items-center font-medium">
+                      <FaBookOpen />
                       <p>{element.name}</p>
-                      {languages[index] && (
-                        <div className="flex gap-3">
-                          {Object.getOwnPropertyNames(languages[index]).map(
-                            (element, index) => (
-                              <p key={index} className="">
-                                {element}
-                              </p>
-                            )
-                          )}
-                        </div>
-                      )}
-                    </a>
+                    </div>
+                    {languages[index] && (
+                      <div className="flex gap-3 ">
+                        {Object.getOwnPropertyNames(languages[index]).map(
+                          (element, index) => (
+                            <p
+                              key={index}
+                              className="bg-gray-500/50 px-3 py- gap-2 rounded-md"
+                            >
+                              {element}
+                            </p>
+                          )
+                        )}
+                      </div>
+                    )}
+                    <Link
+                      to={element.html_url}
+                      target="_blank"
+                      className="flex justify-center items-center w-full py-2 gap-2 border rounded-md group relative overflow-hidden z-40"
+                    >
+                      <div class="absolute inset-0 w-0 bg-[#287eff2e] transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+                      <LuGithub /> <h1>View on Github</h1>
+                    </Link>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-center w-[60%] mx-auto py-5">
+              <div className="flex justify-center lg:w-[60%] mx-auto py-5">
                 <Doughnut data={copa} />
               </div>
             </>
