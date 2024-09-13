@@ -10,6 +10,7 @@ import { IoHome } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { FaBookOpen } from "react-icons/fa6";
 import { LuGithub } from "react-icons/lu";
+import { BiSolidStar } from "react-icons/bi";
 
 export const FirstSectionAbout = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
@@ -66,7 +67,7 @@ export const FirstSectionAbout = () => {
           });
         if (fetchUser && fetchFollowers && fetchRepos) {
           setData(fetchUser.data);
-          
+
           setDataFollowers(fetchFollowers.data);
           setDataRepos(fetchRepos.data);
           // console.log(dataFollowers, data);
@@ -78,7 +79,7 @@ export const FirstSectionAbout = () => {
     fetchingData();
     // setLoading(false);
   }, [userName]);
-  
+  // console.log(dataFollowers);
   useEffect(() => {
     const fetchLanguages = async () => {
       if (repos.length === 0) return;
@@ -185,38 +186,40 @@ export const FirstSectionAbout = () => {
                     <h1 className="text-lg text-white/75"> @{data.login} </h1>
                     <div className="flex gap-5 text-xl">
                       <div className="flex flex-col items-center">
-                        {" "}
                         <p>{data.following}</p> <p>Following</p>
                       </div>
                       <div className="flex flex-col items-center">
-                        {" "}
                         <p>{data.followers}</p> <p>Followers</p>
                       </div>
                       <div className="flex flex-col items-center">
-                        {" "}
                         <p>{data.public_repos}</p> <p>Public Repos</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center flex-wrap lg:flex-row flex-col items-center gap-5">
+              <div className="flex  justify-center flex-wrap lg:flex-row flex-col gap-5">
                 {repos.map((element, index) => (
                   <div
                     key={index}
-                    className="flex flex-col gap-9 bg-gradient-to-tr from-transparent to-[#25344a] border-2 border-slate-200/50 rounded-lg lg:w-[25%] w-full py-4 px-4"
+                    className="flex flex-col gap-5 bg-gradient-to-tr from-transparent to-[#25344a] border-2 border-slate-200/50 rounded-lg lg:w-[25%] w-full py-4 px-4"
                   >
                     <div className="flex gap-2 text-xl items-center font-medium">
                       <FaBookOpen />
-                      <p>{element.name}</p>
+                      <p className="truncate">{element.name}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <BiSolidStar className="text-yellow-500" />
+                      {element.watchers}
+                      <p>stars</p>
                     </div>
                     {languages[index] && (
-                      <div className="flex gap-3 ">
+                      <div className="flex flex-wrap gap-3 ">
                         {Object.getOwnPropertyNames(languages[index]).map(
                           (element, index) => (
                             <p
                               key={index}
-                              className="bg-gray-500/50 px-3 py- gap-2 rounded-md"
+                              className="bg-gray-500/50 px-3  gap-2 rounded-md"
                             >
                               {element}
                             </p>
@@ -227,15 +230,16 @@ export const FirstSectionAbout = () => {
                     <Link
                       to={element.html_url}
                       target="_blank"
-                      className="flex justify-center items-center w-full py-2 gap-2 border rounded-md group relative overflow-hidden z-40"
+                      className="flex mt-auto justify-center items-center w-full py-2 gap-2 border rounded-md group relative overflow-hidden z-40"
                     >
                       <div class="absolute inset-0 w-0 bg-[#287eff2e] transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-                      <LuGithub /> <h1>View on Github</h1>
+                      <LuGithub className="z-50" />
+                      <h1 className="z-50">View on Github</h1>
                     </Link>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-center lg:w-[60%] mx-auto py-5">
+              <div className="flex justify-center lg:w-[40%] mx-auto py-5">
                 <Doughnut data={copa} />
               </div>
             </>
