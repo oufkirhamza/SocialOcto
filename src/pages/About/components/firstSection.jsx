@@ -24,7 +24,7 @@ export const FirstSectionAbout = () => {
   const languages = [...reposLanguages];
   const morpho = {};
   const [loading, setLoading] = useState(true);
-
+  const [switchBtn, setSwitchBtn] = useState(true);
   useEffect(() => {
     const item = JSON.parse(localStorage.getItem("userName"));
     if (item) {
@@ -52,7 +52,7 @@ export const FirstSectionAbout = () => {
             },
           })
           .catch((error) => {
-            // console.log("followers : ", error);
+            console.log("followers : ", error);
           });
 
         // repos
@@ -63,7 +63,7 @@ export const FirstSectionAbout = () => {
             },
           })
           .catch((error) => {
-            // console.log("repos : ", error);
+            console.log("repos : ", error);
           });
         if (fetchUser && fetchFollowers && fetchRepos) {
           setData(fetchUser.data);
@@ -198,50 +198,71 @@ export const FirstSectionAbout = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex  justify-center flex-wrap lg:flex-row flex-col gap-5">
-                {repos.map((element, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col gap-5 bg-gradient-to-tr from-transparent to-[#25344a] border-2 border-slate-200/50 rounded-lg lg:w-[25%] w-full py-4 px-4"
-                  >
-                    <div className="flex gap-2 text-xl items-center font-medium">
-                      <FaBookOpen />
-                      <p className="truncate">{element.name}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BiSolidStar className="text-yellow-500" />
-                      {element.watchers}
-                      <p>stars</p>
-                    </div>
-                    {languages[index] && (
-                      <div className="flex flex-wrap gap-3 ">
-                        {Object.getOwnPropertyNames(languages[index]).map(
-                          (element, index) => (
-                            <p
-                              key={index}
-                              className="bg-gray-500/50 px-3  gap-2 rounded-md"
-                            >
-                              {element}
-                            </p>
-                          )
-                        )}
-                      </div>
-                    )}
-                    <Link
-                      to={element.html_url}
-                      target="_blank"
-                      className="flex mt-auto justify-center items-center w-full py-2 gap-2 border rounded-md group relative overflow-hidden z-40"
+              <div className="flex mx-[10%] rounded-lg p-2 bg-[#263243]">
+                <button
+                  onClick={() => setSwitchBtn(true)}
+                  className={`${
+                    switchBtn ? "bg-white text-black" : "bg-[#263243]"
+                  } rounded-md w-[50%] flex justify-center items-center py-1 `}
+                >
+                  Repository
+                </button>
+                <button
+                  onClick={() => setSwitchBtn(false)}
+                  className={`${
+                    !switchBtn ? "bg-white text-black" : "bg-[#263243]"
+                  } w-[50%] rounded-md flex justify-center items-center py-1 `}
+                >
+                  Activity
+                </button>
+              </div>
+              {switchBtn ? (
+                <div className="flex  justify-center flex-wrap lg:flex-row flex-col gap-5">
+                  {repos.map((element, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col gap-5 bg-gradient-to-tr from-transparent to-[#25344a] border-2 border-slate-200/50 rounded-lg lg:w-[25%] w-full py-4 px-4"
                     >
-                      <div class="absolute inset-0 w-0 bg-[#287eff2e] transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-                      <LuGithub className="z-50" />
-                      <h1 className="z-50">View on Github</h1>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-center lg:w-[40%] mx-auto py-5">
-                <Doughnut data={copa} />
-              </div>
+                      <div className="flex gap-2 text-xl items-center font-medium">
+                        <FaBookOpen />
+                        <p className="truncate">{element.name}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <BiSolidStar className="text-yellow-500" />
+                        {element.watchers}
+                        <p>stars</p>
+                      </div>
+                      {languages[index] && (
+                        <div className="flex flex-wrap gap-3 ">
+                          {Object.getOwnPropertyNames(languages[index]).map(
+                            (element, index) => (
+                              <p
+                                key={index}
+                                className="bg-gray-500/50 px-3  gap-2 rounded-md"
+                              >
+                                {element}
+                              </p>
+                            )
+                          )}
+                        </div>
+                      )}
+                      <Link
+                        to={element.html_url}
+                        target="_blank"
+                        className="flex mt-auto justify-center items-center w-full py-2 gap-2 border rounded-md group relative overflow-hidden z-40"
+                      >
+                        <div className="absolute inset-0 w-0 bg-[#287eff2e] transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+                        <LuGithub className="z-50" />
+                        <h1 className="z-50">View on Github</h1>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex justify-center lg:w-[40%] mx-auto py-5">
+                  <Doughnut data={copa} />
+                </div>
+              )}
             </>
           ) : (
             <div className="w-full h-[100vh] flex flex-col items-center justify-center text-4xl text-white">
