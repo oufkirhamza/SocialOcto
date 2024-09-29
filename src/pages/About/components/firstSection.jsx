@@ -70,7 +70,7 @@ export const FirstSectionAbout = () => {
 
           setDataFollowers(fetchFollowers.data);
           setDataRepos(fetchRepos.data);
-          // console.log(dataFollowers, data);
+          // console.log(repos);
         } else {
           setLoading(false);
         }
@@ -229,7 +229,7 @@ export const FirstSectionAbout = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <BiSolidStar className="text-yellow-500" />
-                        {element.watchers}
+                        {element.stargazers_count}
                         <p>stars</p>
                       </div>
                       {languages[index] && (
